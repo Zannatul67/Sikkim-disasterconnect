@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TechTectonics — Sikkim DisasterConnect</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<style>
+:root{--bg:#f4f7fc;--card:#fff;--tx:#0b1b36;--mut:#52648a;--ac:#0e7490;--ac2:#2563eb;--bd:#d5deee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1428;--card:#101d38;--tx:#e6eefc;--mut:#8fa3c7;--ac:#22d3ee;--ac2:#3b82f6;--bd:#1e3358;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a1428;--card:#101d38;--tx:#e6eefc;--mut:#8fa3c7;--ac:#22d3ee;--ac2:#3b82f6;--bd:#1e3358;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--card);border-bottom:1px solid var(--bd);padding:8px 14px}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:18px;letter-spacing:.3px;color:var(--ac)}.logo small{display:block;font-size:10px;color:var(--mut);font-weight:500}
+nav{display:flex;gap:4px;overflow-x:auto;padding-top:6px}
+nav a{white-space:nowrap;padding:6px 11px;border-radius:8px;color:var(--mut);text-decoration:none;font-size:14px}
+nav a.on{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff}
+nav a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+main{max-width:1100px;margin:0 auto;padding:16px 14px 30px}
+h1{font-size:22px;margin:4px 0 12px}h2{font-size:16px;margin:0 0 8px}
+.grid{display:grid;gap:12px}.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px}
+.stat b{display:block;font-size:28px;color:var(--ac)}.stat span{color:var(--mut);font-size:13px}
+.b{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;border:1px solid var(--c);color:var(--c);margin:1px 3px 1px 0}
+.row{padding:10px 0;border-top:1px solid var(--bd)}.row:first-child{border-top:0}
+.mut{color:var(--mut);font-size:13px}
+.fb{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+input,select,textarea,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;min-height:40px}
+textarea{width:100%;min-height:90px}
+label{display:block;font-size:13px;color:var(--mut);margin:8px 0 2px}
+button{cursor:pointer;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:0;font-weight:600}
+button.s{background:var(--bg);color:var(--tx);border:1px solid var(--bd)}button.d{background:#be123c}
+.bar{height:10px;border-radius:5px;background:var(--c);min-width:3px}
+.err{background:#be123c22;border:1px solid #be123c;border-radius:8px;padding:8px 12px;margin:8px 0}
+.ok{background:#16a34a22;border:1px solid #16a34a;border-radius:8px;padding:10px 12px;margin:8px 0}
+.warn{background:#f59e0b22;border:1px solid #f59e0b;border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:13px}
+svg{width:100%;height:auto;background:var(--bg);border-radius:10px;border:1px solid var(--bd)}
+svg text{font-family:inherit}
+footer{border-top:1px solid var(--bd);padding:14px;font-size:12.5px;color:var(--mut);text-align:center}
+@media(prefers-reduced-motion:no-preference){.card{transition:border-color .2s}.card:hover{border-color:var(--ac)}}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:660px}th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--bd);vertical-align:top;font-size:14px}th{font-size:12.5px;color:var(--mut)}
+.th{background:none;border:0;color:inherit;padding:0;min-height:0;font-weight:700;cursor:pointer}
+dl.dd{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:8px 0}dl.dd dt{color:var(--mut)}dl.dd dd{margin:0}
+.fb label.i{margin:0;display:flex;align-items:center;gap:6px}.fb input[type=number]{width:92px}
+.gm{display:grid;gap:12px;grid-template-columns:minmax(0,2fr) minmax(260px,1fr)}@media(max-width:760px){.gm{grid-template-columns:1fr}}
+#lm,#hm{height:min(72vh,560px);min-height:340px;border-radius:10px;border:1px solid var(--bd);position:relative;z-index:0}
+.hmk{font-size:17px;line-height:26px;text-align:center;background:#fff;border:2px solid #be123c;border-radius:50%;width:30px;height:30px;box-shadow:0 1px 4px #0007}
+.wxd{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin-top:10px}.wxd>div{border:1px solid var(--bd);border-radius:10px;padding:8px;text-align:center;background:var(--bg);font-size:13px}.wxd .e{font-size:26px;line-height:1.2}
+.big{font-size:38px;font-weight:800;color:var(--ac);line-height:1.1}
+.leaflet-container{font:inherit}.leaflet-popup-content{color:#0b1b36}
+</style></head><body>
+<header><div class="top"><div class="logo">TechTectonics<small>Sikkim DisasterConnect</small></div>
+<span style="flex:1"></span><label style="margin:0">Demo sign-in <select id="role" onchange="setRole(this.value)" aria-label="Demo role"></select></label>
+<button class="s" onclick="tog()" aria-label="Toggle theme">◐</button></div><nav id="nav" aria-label="Main"></nav></header>
+<main id="app"></main>
+<script type="application/json" id="disasters-data">
+[
+ {
+  "event_id": 1,
+  "date_text": "Sep 1990",
+  "year": 1990,
+  "event": "Landslide (Sikkim)",
+  "hazard_type": "Landslide",
+  "location_text": "Sikkim (location not given)",
+  "district_primary": "Unknown",
+  "districts_other": "",
+  "district_basis": "not stated in source",
+  "deaths": 16,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Disaster database lists a Sikkim landslide in Sep 1990 with 16 killed and 30 injured; the extracted table text was ambiguous, so verify against the original ADRC databook.",
+  "source": "ADRC Disaster Databook, India (EM-DAT-based)"
+ },
+ {
+  "event_id": 2,
+  "date_text": "1991-09-21",
+  "year": 1991,
+  "event": "M4.9 earthquake near South Lhonak glacier",
+  "hazard_type": "Earthquake",
+  "location_text": "Near the glacier feeding South Lhonak Lake, North Sikkim",
+  "district_primary": "Mangan",
+  "districts_other": "",
+  "district_basis": "inferred from place name",
+  "deaths": null,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Seismic event near the lake that later burst in 2023; casualties not stated in source.",
+  "source": "Down To Earth; Sikkim Forest and Environment Dept report"
+ },
+ {
+  "event_id": 3,
+  "date_text": "1995-09-05",
+  "year": 1995,
+  "event": "Gangtok mud avalanche / landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Gangtok, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 32,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Heavy rain triggered a mud avalanche near Gangtok; 8 houses completely damaged.",
+  "source": "SSDMA landslide inventory; Sikkim disaster summary (NCDR)"
+ },
+ {
+  "event_id": 4,
+  "date_text": "Jun 1997 (7-8 Jun peak)",
+  "year": 1997,
+  "event": "Gangtok cloudburst and landslides (Chandmari, Burdang)",
+  "hazard_type": "Landslide",
+  "location_text": "Gangtok and vicinity, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 43,
+  "missing": null,
+  "people_affected": null,
+  "notes": "5-hour, 210 mm rainfall on 7 Jun 1997 triggered the Chandmari and Burdang slides. State summary: 43 dead, ~1,300 houses damaged. Other sources differ: Sikkim Express says over 50 killed, 60 seriously injured and 5,000 families affected that month; ADRC database lists 28 killed.",
+  "source": "Sikkim disaster summary (NCDR); ScienceDirect (Gangtok landslides); Sikkim Express; ADRC databook"
+ },
+ {
+  "event_id": 5,
+  "date_text": "Aug 2000 (3rd-4th week)",
+  "year": 2000,
+  "event": "Gyalshing landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Gyalshing, West Sikkim",
+  "district_primary": "Gyalshing",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 11,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Landslide during the last weeks of August 2000 claimed eleven lives.",
+  "source": "SSDMA, Inventory and GIS mapping of landslides in Sikkim"
+ },
+ {
+  "event_id": 6,
+  "date_text": "2000-09-26",
+  "year": 2000,
+  "event": "Kyongsa-Legship road landslide",
+  "hazard_type": "Landslide",
+  "location_text": "West Sikkim",
+  "district_primary": "Gyalshing",
+  "districts_other": "",
+  "district_basis": "inferred from place name",
+  "deaths": 5,
+  "missing": null,
+  "people_affected": null,
+  "notes": "5 dead; 28 families evacuated (families, not individuals, so not counted as people affected).",
+  "source": "SSDMA landslide inventory; Sikkim disaster summary (NCDR)"
+ },
+ {
+  "event_id": 7,
+  "date_text": "2005-09-26",
+  "year": 2005,
+  "event": "Mangzing (Ravangla) landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Mangzing, South Sikkim",
+  "district_primary": "Namchi",
+  "districts_other": "",
+  "district_basis": "inferred from place name",
+  "deaths": 7,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Triggered by persistent heavy rain; 28 families evacuated.",
+  "source": "SSDMA landslide inventory; Sikkim disaster summary (NCDR)"
+ },
+ {
+  "event_id": 8,
+  "date_text": "2006-02-14",
+  "year": 2006,
+  "event": "Sikkim earthquake (M5.3-5.7)",
+  "hazard_type": "Earthquake",
+  "location_text": "Sikkim",
+  "district_primary": "Statewide",
+  "districts_other": "",
+  "district_basis": "not stated in source",
+  "deaths": null,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Sources conflict: an AFP list says M5.7, historic buildings damaged, no deaths; Wikipedia's India earthquake list says M5.3 with 2 deaths and 2 injured (landslide). Deaths left blank.",
+  "source": "AFP list via Solar Daily; Wikipedia (List of earthquakes in India)"
+ },
+ {
+  "event_id": 9,
+  "date_text": "2007-06-28",
+  "year": 2007,
+  "event": "Gangtok landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Gangtok, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 2,
+  "missing": null,
+  "people_affected": null,
+  "notes": "2 killed.",
+  "source": "Historical Records of Socio-economically Significant Landslides in India (ResearchGate)"
+ },
+ {
+  "event_id": 10,
+  "date_text": "2007-08-03",
+  "year": 2007,
+  "event": "Gangtok landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Gangtok, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 3,
+  "missing": null,
+  "people_affected": null,
+  "notes": "3 killed, 1 injured.",
+  "source": "Historical Records of Socio-economically Significant Landslides in India (ResearchGate)"
+ },
+ {
+  "event_id": 11,
+  "date_text": "2007-09-05",
+  "year": 2007,
+  "event": "Gangtok landslides cut Sikkim off",
+  "hazard_type": "Landslide",
+  "location_text": "Gangtok, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": null,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Sikkim cut off from the rest of the country; casualties not stated in source.",
+  "source": "Historical Records of Socio-economically Significant Landslides in India (ResearchGate)"
+ },
+ {
+  "event_id": 12,
+  "date_text": "2009-08-20",
+  "year": 2009,
+  "event": "Highway-blocking landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Sikkim (highway)",
+  "district_primary": "Unknown",
+  "districts_other": "",
+  "district_basis": "not stated in source",
+  "deaths": null,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Landslide blocked the highway; casualties not stated in source.",
+  "source": "Historical Records of Socio-economically Significant Landslides in India (ResearchGate)"
+ },
+ {
+  "event_id": 13,
+  "date_text": "Jun-Aug 2010",
+  "year": 2010,
+  "event": "Monsoon landslides block key roads",
+  "hazard_type": "Landslide",
+  "location_text": "Pegong and Tingda (North Sikkim); Singtam-Mangan road",
+  "district_primary": "Mangan",
+  "districts_other": "Gangtok",
+  "district_basis": "inferred from place name",
+  "deaths": null,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Road to Lachung cut (16 Jun, Pegong); Mangan-Gangtok blocked (14 Jul, Tingda); Singtam-Mangan blocked (19 Aug). Casualties not stated in source.",
+  "source": "Historical Records of Socio-economically Significant Landslides in India (ResearchGate)"
+ },
+ {
+  "event_id": 14,
+  "date_text": "2011-09-18",
+  "year": 2011,
+  "event": "Sikkim earthquake, M6.9",
+  "hazard_type": "Earthquake",
+  "location_text": "Epicentre ~68 km NW of Gangtok; Sikkim, plus West Bengal, Bihar, Nepal, Tibet",
+  "district_primary": "Statewide",
+  "districts_other": "Mangan; Gangtok",
+  "district_basis": "location in source",
+  "deaths": 71,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Indian Govt reported 92 deaths in India as of 23 Sep 2011: 71 in Sikkim, 12 West Bengal, 9 Bihar. Region-wide toll (incl. Nepal, Tibet) reported as at least 111 on Wikipedia. Described as possibly the most damaging quake in Sikkim since 1800; houses weakened by monsoon rain collapsed.",
+  "source": "ADRC disaster information; ASC India; Wikipedia"
+ },
+ {
+  "event_id": 15,
+  "date_text": "2011",
+  "year": 2011,
+  "event": "Gyalshing landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Gyalshing, West Sikkim",
+  "district_primary": "Gyalshing",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 18,
+  "missing": null,
+  "people_affected": null,
+  "notes": "3 houses fully damaged. Exact date not given in source.",
+  "source": "Sikkim disaster summary (NCDR)"
+ },
+ {
+  "event_id": 16,
+  "date_text": "2012",
+  "year": 2012,
+  "event": "Landslides / flash floods / rockfalls",
+  "hazard_type": "Landslide",
+  "location_text": "Sikkim",
+  "district_primary": "Statewide",
+  "districts_other": "",
+  "district_basis": "not stated in source",
+  "deaths": 41,
+  "missing": 6,
+  "people_affected": null,
+  "notes": "Includes flash floods and rockfalls; many houses fully or partly damaged. Exact dates not given in source.",
+  "source": "Sikkim disaster summary (NCDR)"
+ },
+ {
+  "event_id": 17,
+  "date_text": "2018-12-28",
+  "year": 2018,
+  "event": "Heavy snowfall, Nathu La road",
+  "hazard_type": "Snowfall / stranding",
+  "location_text": "Between 17 Mile and Nathu La, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "inferred from place name",
+  "deaths": null,
+  "missing": null,
+  "people_affected": 3000,
+  "notes": "About 3,000 tourists stranded; rescued by the Indian Army.",
+  "source": "Swarajya (30 Dec 2018) via ScienceDirect SSDMA-based table"
+ },
+ {
+  "event_id": 18,
+  "date_text": "2019-07",
+  "year": 2019,
+  "event": "Monsoon landslides damage homes",
+  "hazard_type": "Landslide",
+  "location_text": "Pakyong, Khamdong, Martam and other places",
+  "district_primary": "Multiple",
+  "districts_other": "Pakyong; Gangtok",
+  "district_basis": "inferred from place name",
+  "deaths": null,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Multiple landslides damaged houses and disrupted traffic across Sikkim; no toll in the source.",
+  "source": "SSDMA news archive"
+ },
+ {
+  "event_id": 19,
+  "date_text": "2019-12-27",
+  "year": 2019,
+  "event": "Heavy snowfall, Nathu La road",
+  "hazard_type": "Snowfall / stranding",
+  "location_text": "13th Mile to Nathu La, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "inferred from place name",
+  "deaths": null,
+  "missing": null,
+  "people_affected": 1600,
+  "notes": "1,500-1,700 tourists stranded (midpoint 1,600 entered); rescued by the Indian Army.",
+  "source": "Team India Sentinels (29 Dec 2019) via ScienceDirect table"
+ },
+ {
+  "event_id": 20,
+  "date_text": "May 2020",
+  "year": 2020,
+  "event": "Lingchom landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Lingchom, Sikkim",
+  "district_primary": "Unknown",
+  "districts_other": "",
+  "district_basis": "not stated in source",
+  "deaths": 1,
+  "missing": null,
+  "people_affected": null,
+  "notes": "1 died, 2 injured.",
+  "source": "SSDMA news archive"
+ },
+ {
+  "event_id": 21,
+  "date_text": "Jun 2020",
+  "year": 2020,
+  "event": "Landslide on road work",
+  "hazard_type": "Landslide",
+  "location_text": "South Sikkim",
+  "district_primary": "Namchi",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 2,
+  "missing": null,
+  "people_affected": null,
+  "notes": "Two road workers killed. Exact date approximate (June 2020).",
+  "source": "SSDMA news archive"
+ },
+ {
+  "event_id": 22,
+  "date_text": "c. Oct 2020",
+  "year": 2020,
+  "event": "West Sikkim landslide",
+  "hazard_type": "Landslide",
+  "location_text": "West Sikkim",
+  "district_primary": "Gyalshing",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 2,
+  "missing": null,
+  "people_affected": null,
+  "notes": "2 dead, 3 injured. Date approximate: taken from an archive listing dated 4 Oct 2020.",
+  "source": "SSDMA news archive"
+ },
+ {
+  "event_id": 23,
+  "date_text": "2022-09-01",
+  "year": 2022,
+  "event": "Yumthang landslide after lake burst",
+  "hazard_type": "Landslide",
+  "location_text": "Yumthang, North Sikkim",
+  "district_primary": "Mangan",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": null,
+  "missing": null,
+  "people_affected": 78,
+  "notes": "Army rescued 78 people.",
+  "source": "Sikkim Express (2 Sep 2022) via ScienceDirect table"
+ },
+ {
+  "event_id": 24,
+  "date_text": "2023-04-04",
+  "year": 2023,
+  "event": "Nathu La avalanche",
+  "hazard_type": "Avalanche",
+  "location_text": "15th Mile, Gangtok-Nathu La road, East Sikkim",
+  "district_primary": "Gangtok",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 7,
+  "missing": null,
+  "people_affected": null,
+  "notes": "7 tourists killed (some early reports said 6), 11+ injured; 22 rescued alive.",
+  "source": "PTI/Udayavani; ETV Bharat; Reuters via Dawn/Aaj"
+ },
+ {
+  "event_id": 25,
+  "date_text": "2023-10-04",
+  "year": 2023,
+  "event": "South Lhonak Lake GLOF, Teesta basin",
+  "hazard_type": "GLOF / Flash flood",
+  "location_text": "North Sikkim (Chungthang); downstream Mangan, Gangtok, Pakyong, Namchi",
+  "district_primary": "Mangan",
+  "districts_other": "Gangtok; Pakyong; Namchi",
+  "district_basis": "location in source",
+  "deaths": 179,
+  "missing": null,
+  "people_affected": 88400,
+  "notes": "Deaths: AFP (Jun 2024) says at least 179 died; this likely includes people later presumed dead. Early tolls were far lower: SSDMA 30 dead, 81 missing (7 Oct 2023); Mongabay 35 dead, ~104 missing. Affected: ~88,400. Destroyed the Teesta III dam.",
+  "source": "Malay Mail/AFP; AIR newsonair (SSDMA); Mongabay India; Shankar IAS Parliament"
+ },
+ {
+  "event_id": 26,
+  "date_text": "2024-06-12 to 06-14",
+  "year": 2024,
+  "event": "Mangan landslides and cloudburst",
+  "hazard_type": "Landslide",
+  "location_text": "Mangan district (Dzongu, Chungthang, Lachen, Lachung)",
+  "district_primary": "Mangan",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 9,
+  "missing": null,
+  "people_affected": 1447,
+  "notes": "State toll 9 (SPHERE India sitrep, AIR); some outlets reported 6. 1,447 stranded tourists evacuated by 19 Jun. About 50 houses damaged; NH-10 cut off.",
+  "source": "SPHERE India sitrep (14 Jun 2024); AIR newsonair; News Arena; Siasat/PTI"
+ },
+ {
+  "event_id": 27,
+  "date_text": "Apr 2025",
+  "year": 2025,
+  "event": "North Sikkim landslides strand tourists",
+  "hazard_type": "Landslide",
+  "location_text": "North Sikkim",
+  "district_primary": "Mangan",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": null,
+  "missing": null,
+  "people_affected": 1000,
+  "notes": "Over 1,000 tourists stranded after landslides blocked key routes. Casualties not stated in snippet seen.",
+  "source": "News Arena (headline, 25 Apr 2025)"
+ },
+ {
+  "event_id": 28,
+  "date_text": "2025-06-01",
+  "year": 2025,
+  "event": "Chaten (Lachen) landslide at army camp",
+  "hazard_type": "Landslide",
+  "location_text": "Chaten, Lachen, Mangan district",
+  "district_primary": "Mangan",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 3,
+  "missing": 6,
+  "people_affected": 1678,
+  "notes": "3 army personnel killed, 4 injured, 6 missing. 3 of the missing recovered by 10 Jun; later toll not verified. 1,678 tourists evacuated from the region; IAF airlifted civilians and 76 army personnel.",
+  "source": "Deccan Herald; AIR newsonair; PTI via The Week"
+ },
+ {
+  "event_id": 29,
+  "date_text": "2026-07-20",
+  "year": 2026,
+  "event": "Samardung tunnel collapse, NHPC Teesta Stage VI",
+  "hazard_type": "Landslide",
+  "location_text": "Samardung, Jorethang, Namchi district",
+  "district_primary": "Namchi",
+  "districts_other": "",
+  "district_basis": "location in source",
+  "deaths": 10,
+  "missing": null,
+  "people_affected": 25,
+  "notes": "Under-construction tunnel collapsed after a landslide blocked the entrance; methane gas blast suspected. At least 10 workers dead; 15-25 trapped as of 21 Jul (count varied by source). NH-10 also cut at 20th Mile. Final toll not verified.",
+  "source": "Business Today (21 Jul 2026); UNI; Onmanorama; Outlook"
+ },
+ {
+  "event_id": 30,
+  "date_text": "2026-09-24",
+  "year": 2026,
+  "event": "Rimbi village landslide",
+  "hazard_type": "Landslide",
+  "location_text": "Rimbi, Yuksom-Tashiding area, West Sikkim",
+  "district_primary": "Gyalshing",
+  "districts_other": "",
+  "district_basis": "inferred from place name",
+  "deaths": 0,
+  "missing": null,
+  "people_affected": null,
+  "notes": "No casualties reported; houses and government buildings damaged; road to Khecheopalri washed away.",
+  "source": "India TV (25 Sep 2026); EastMojo (7 Oct 2026)"
+ }
+]
+</script>
+<footer>TechTectonics is a community-information platform and is <b>not a replacement for official emergency services</b>. Demo data is fictional until verified sources are connected. · <a href="#/privacy" style="color:var(--ac)">Privacy &amp; Terms</a></footer>
+<script>
+const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DS=['Gangtok','Pakyong','Mangan','Gyalshing','Soreng','Namchi'],SEV=['Low','Medium','High','Critical'],SI=['▲','●','■','◆'],SC=['#4ade80','#facc15','#fb923c','#f43f5e'];
+const ST=['Submitted','Under Review','Verified','Assigned','In Progress','Resolved','Rejected'],CAT=['Landslide','Flash flood','Earthquake','Road blockage','Infrastructure damage','Medical emergency','Other'];
+const RS={'Open':'#22c55e','Closed':'#f43f5e','Partially blocked':'#f59e0b','Landslide-affected':'#fb923c','Restricted':'#a78bfa'};
+const ago=h=>new Date(Date.now()+-h*36e5).toISOString(),fmt=t=>new Date(t).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
+const ROLES={public:'Public user',responder:'Verified responder',adminA:'Administrator A',adminB:'Administrator B'};
+function seed(){
+const I=(n,cat,dist,loc,lat,lon,sev,status,h,desc)=>({id:'D'+n,ref:'DEMO-'+(100+n),cat,desc,dist,loc,lat,lon,sev,status,t:ago(h),demo:1,fl:0});
+const R=(id,name,dist,status,h,pts)=>({id,name,dist,status,upd:ago(h),src:'Demo data',pts});
+const A=(n,title,level,area,pub,exp,status,by)=>({id:'A'+n,title,level,area,pub:ago(pub),exp:ago(-exp),src:'Demo data',status,by});
+const sv=[];DS.forEach(d=>[['District Disaster Management Office','Disaster management'],['Police','Police'],['District Hospital','Hospital / ambulance'],['Fire and Rescue','Fire and rescue']].forEach(([n,t])=>sv.push({id:'S'+sv.length,name:n+' — '+d,type:t,area:d,phone:'',addr:'',src:'Placeholder (not verified)',ver:null})));const vs=(n,name,type,area,phone,src)=>({id:'V'+n,name,type,area,phone,addr:'',src,ver:'27 Oct 2026'});const SSD='ANI report, 6 Sep 2026',SEC='Public directory listing';sv.unshift(vs(1,'National Emergency Number (all services)','Emergency','Sikkim-wide','112',SEC),vs(2,'Police helpline','Police','Sikkim-wide','100',SEC),vs(3,'Fire helpline','Fire and rescue','Sikkim-wide','101',SEC),vs(4,'Ambulance helpline','Hospital / ambulance','Sikkim-wide','108',SEC),vs(5,'SSDMA / State Emergency Operations Centre (Gangtok)','Disaster management','Gangtok','03592-201145',SSD),vs(6,'SSDMA / State Emergency Operations Centre (Gangtok), line 2','Disaster management','Gangtok','03592-202461',SSD),vs(7,'DDMA Gyalshing','Disaster management','Gyalshing','03595-250633',SSD),vs(8,'DDMA Soreng','Disaster management','Soreng','03595-291660',SSD),vs(9,'DDMA Pakyong','Disaster management','Pakyong','03592-200024',SSD));
+return{role:'public',read:{},mine:[],audit:[],log:[],svc:sv,
+inc:[I(1,'Landslide','Mangan','Demo site near Chungthang road',27.6,88.64,3,'In Progress',5,'Simulated slope failure blocking one lane.'),I(2,'Road blockage','Gangtok','Demo site on a city link road',27.33,88.61,1,'Under Review',2,'Simulated fallen tree and debris.'),I(3,'Flash flood','Soreng','Demo stream crossing',27.17,88.19,2,'Submitted',1,'Simulated rapid stream rise reported.'),I(4,'Landslide','Namchi','Demo hillside near a highway',27.17,88.36,2,'Assigned',9,'Simulated minor slide on a feeder road.'),I(5,'Infrastructure damage','Pakyong','Demo footbridge',27.23,88.59,1,'Resolved',30,'Simulated damaged railing, since repaired.'),I(6,'Earthquake','Gyalshing','Demo locality',27.28,88.26,0,'Submitted',3,'Simulated tremor felt report.'),I(7,'Landslide','Pakyong','Demo site on the NH10 corridor',27.14,88.5,3,'Verified',8,'Simulated large slide partially blocking the highway.'),I(8,'Road blockage','Mangan','Demo site north of Mangan',27.55,88.58,2,'In Progress',14,'Simulated debris across the road; clearing under way.'),I(9,'Flash flood','Gangtok','Demo stream near the city',27.36,88.58,1,'Resolved',52,'Simulated overflow in a drain, since receded.'),I(10,'Infrastructure damage','Namchi','Demo retaining wall',27.2,88.35,2,'Under Review',7,'Simulated cracks in a retaining wall.'),I(11,'Medical emergency','Soreng','Demo village',27.14,88.22,2,'Assigned',4,'Simulated request for medical access over a blocked road.'),I(12,'Landslide','Gyalshing','Demo slope near a village road',27.3,88.2,1,'Resolved',90,'Simulated small slide, cleared.'),I(13,'Road blockage','Pakyong','Demo site',27.24,88.6,0,'Submitted',2,'Simulated vehicle breakdown narrowing the road.'),I(14,'Landslide','Mangan','Demo site',27.45,88.5,2,'Rejected',40,'Simulated report rejected after review: duplicate.'),I(15,'Flash flood','Namchi','Demo river crossing',27.1,88.4,1,'Under Review',6,'Simulated water over a low causeway.'),I(16,'Earthquake','Mangan','Demo locality',27.7,88.55,1,'Resolved',120,'Simulated minor tremor, no damage found.')],
+roads:[R('R1','NH10 · Teesta–Rangpo section','Pakyong','Landslide-affected',3,[[27.1,88.47],[27.18,88.53]]),R('R2','NH10 · Rangpo–Singtam section','Pakyong','Partially blocked',6,[[27.18,88.53],[27.23,88.5]]),R('R3','Singtam–Mangan road','Mangan','Open',20,[[27.23,88.5],[27.51,88.53]]),R('R4','Mangan–Chungthang road','Mangan','Closed',5,[[27.51,88.53],[27.6,88.64]]),R('R5','Gangtok–Nathu La road','Gangtok','Restricted',12,[[27.33,88.61],[27.38,88.77]]),R('R6','Namchi–Jorethang road','Namchi','Open',48,[[27.17,88.36],[27.15,88.27]]),R('R7','Singtam–Gangtok link','Gangtok','Open',70,[[27.23,88.5],[27.33,88.61]])],
+alerts:[A(1,'Heavy-rain advisory (demo)','high','Gangtok',4,20,'published','adminA'),A(2,'Road closure: Mangan–Chungthang (demo)','medium','Mangan',5,30,'published','adminA'),A(3,'Landslide warning, NH10 corridor (demo)','critical','Pakyong',1,12,'pending','adminA'),A(4,'Seasonal safety reminder (demo)','info','Sikkim-wide',60,-10,'published','adminA')]}}
+let S=(()=>{try{const s=JSON.parse(localStorage.getItem('tnx2'));if(s&&s.inc)return s}catch(e){}return seed()})();
+const save=()=>{try{localStorage.setItem('tnx2',JSON.stringify(S))}catch(e){}};
+let F={d:'',s:'',c:'',st:'',q:'',w:'all'},sel=null;
+const R=()=>S.role,isA=()=>R().startsWith('admin');
+const b=(t,c)=>`<span class="b" style="--c:${c}">${esc(t)}</span>`,sevB=s=>b(SI[s]+' '+SEV[s],SC[s]);
+const vOK=i=>['Verified','Assigned','In Progress','Resolved'].includes(i.status);
+const tag=i=>i.demo?b('DEMO','#a78bfa'):vOK(i)?b('Verified','#22c55e'):b('Unverified','#f59e0b');
+const aud=a=>{S.audit.unshift({t:new Date().toISOString(),r:ROLES[R()],a});S.audit=S.audit.slice(0,40);save()};
+const live=a=>a.status==='published'&&new Date(a.exp)>new Date();
+function opts(arr,v,all){return (all?`<option value="">${all}</option>`:'')+arr.map(x=>`<option ${x===v?'selected':''}>${esc(x)}</option>`).join('')}
+function vis(){const lim={'24h':1,'7d':7}[F.w];return S.inc.filter(i=>i.status!=='Withdrawn'&&(!F.d||i.dist===F.d)&&(F.s===''||i.sev==F.s)&&(!F.c||i.cat===F.c)&&(!F.st||i.status===F.st)&&(!lim||Date.now()-new Date(i.t)<lim*864e5))}
+function filt(w){return `<div class="fb"><select aria-label="District" onchange="F.d=this.value;go()">${opts(DS,F.d,'All districts')}</select><select aria-label="Severity" onchange="F.s=this.value;go()"><option value="">All severities</option>${SEV.map((s,i)=>`<option value="${i}" ${F.s==i&&F.s!==''?'selected':''}>${s}</option>`).join('')}</select><select aria-label="Category" onchange="F.c=this.value;go()">${opts(CAT,F.c,'All categories')}</select>${w?`<select aria-label="Date" onchange="F.w=this.value;go()"><option value="all">Any date</option><option value="24h" ${F.w=='24h'?'selected':''}>Last 24 h</option><option value="7d" ${F.w=='7d'?'selected':''}>Last 7 days</option></select>`:`<select aria-label="Status" onchange="F.st=this.value;go()">${opts(ST,F.st,'All statuses')}</select>`}<button class="s" onclick="F={d:'',s:'',c:'',st:'',q:'',w:'all'};go()">Reset</button></div>`}
+function irow(i){return `<div class="row"><b>${esc(i.cat)}</b> · ${esc(i.dist)} ${sevB(i.sev)}${b(i.status,'#38bdf8')}${tag(i)}<div class="mut">${esc(i.loc)} — ${esc(i.desc)} · ${fmt(i.t)}</div></div>`}
+const V={};
+V.home=()=>{const I=vis(),all=S.inc.filter(i=>i.status!=='Withdrawn'),act=all.filter(i=>!['Resolved','Rejected'].includes(i.status)),top=S.alerts.filter(live).sort((a,b)=>['critical','high','medium','info'].indexOf(a.level)-['critical','high','medium','info'].indexOf(b.level))[0];
+const mx=Math.max(1,...SEV.map((_,s)=>I.filter(i=>i.sev==s).length)),md=Math.max(1,...DS.map(d=>I.filter(i=>i.dist===d).length));
+return `<div class="warn"><b>Demo mode.</b> Records marked DEMO are fictional. Reports from the public stay Unverified until an administrator reviews them.</div><h1>Situation dashboard</h1>
+<div class="card" style="margin-bottom:12px">Highest active alert: ${top?b(top.level.toUpperCase(),top.level=='critical'?'#f43f5e':'#22d3ee')+esc(top.title)+' · '+esc(top.area):'No active alerts'}</div>
+<div class="grid g4"><div class="card stat"><b>${all.length}</b><span>Total reported incidents</span></div><div class="card stat"><b>${act.length}</b><span>Active emergencies</span></div><div class="card stat"><b>${S.roads.filter(r=>r.status!=='Open').length}</b><span>Blocked or affected roads</span></div><div class="card stat"><b>${all.filter(i=>i.status==='Resolved').length}</b><span>Resolved</span></div></div><br>${filt()}
+<div class="grid g2"><div class="card"><h2>Severity distribution</h2>${SEV.map((s,k)=>{const n=I.filter(i=>i.sev==k).length;return `<div class="mut">${SI[k]} ${s} (${n})</div><div class="bar" style="--c:${SC[k]};width:${n/mx*100}%"></div>`}).join('')}<h2 style="margin-top:14px">By district</h2>${DS.map(d=>{const n=I.filter(i=>i.dist===d).length;return `<div class="mut">${d} (${n})</div><div class="bar" style="--c:var(--ac2);width:${n/md*100}%"></div>`}).join('')}</div>
+<div class="card"><h2>Latest safety alerts</h2>${S.alerts.filter(live).slice(0,3).map(alRow).join('')||'<p class="mut">No active alerts.</p>'}<h2 style="margin-top:14px">Road snapshot</h2>${Object.keys(RS).map(k=>`${b(k+': '+S.roads.filter(r=>r.status===k).length,RS[k])}`).join('')}</div></div><br>
+<div class="card" id="hwx" style="margin-bottom:12px"><h2>Weather in Gangtok</h2><span class="mut">Loading…</span></div>
+${DIS?`<div class="card" style="margin-bottom:12px"><h2>Historical reported events</h2><p style="margin:0 0 8px">${DIS.length} events from ${Math.min(...DIS.map(e=>e.year))} to ${Math.max(...DIS.map(e=>e.year))} compiled from news and government sources; ${DIS.filter(e=>e.hazard_type==='Landslide').length} are landslides. Counts reflect reporting, not risk, and are not a prediction.</p><a href="#/history"><button type="button">Open the history table</button></a></div>`:''}<div class="card"><h2>Recent community reports (${I.length})</h2>${I.sort((a,b)=>new Date(b.t)-new Date(a.t)).slice(0,8).map(irow).join('')||'<p class="mut">No incidents match these filters.</p>'}</div>`};
+const P=([la,lo])=>[((lo-87.95)*600).toFixed(1),((28.2-la)/1.15*520).toFixed(1)];
+V.mapSvg=()=>{const I=vis(),out=[[27.1,88.15],[27.3,88],[27.7,88.05],[27.95,88.15],[28.1,88.3],[28.1,88.6],[27.9,88.9],[27.5,88.85],[27.3,88.9],[27.15,88.7],[27.1,88.5]].map(p=>P(p).join(',')).join(' ');
+const pick=sel&&(S.inc.find(i=>i.id===sel)||S.roads.find(r=>r.id===sel));
+return `<h1>Disaster map</h1><div class="warn"><b>Offline view.</b> The real map could not load (no internet or the map library was blocked), so this simple schematic of Sikkim is shown instead. Positions are approximate and demonstrative.</div>${filt(1)}
+<div class="grid g2"><div class="card"><svg viewBox="0 0 600 520" role="img" aria-label="Schematic Sikkim map"><polygon points="${out}" fill="var(--card)" stroke="var(--ac)" stroke-width="2"/>${S.roads.map(r=>`<polyline tabindex="0" onclick="pk('${r.id}')" points="${r.pts.map(p=>P(p).join(',')).join(' ')}" fill="none" stroke="${RS[r.status]}" stroke-width="${sel===r.id?7:4}" ${r.status==='Open'?'':'stroke-dasharray="8 5"'} style="cursor:pointer"/>`).join('')}${I.map(i=>{const[x,y]=P([i.lat,i.lon]);return `<g tabindex="0" role="button" aria-label="${esc(i.cat)} ${SEV[i.sev]}" onclick="pk('${i.id}')" onkeydown="if(event.key=='Enter')pk('${i.id}')" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="${sel===i.id?15:11}" fill="${SC[i.sev]}" stroke="#0a1428" stroke-width="2"/><text x="${x}" y="${+y+4}" text-anchor="middle" font-size="11" fill="#0a1428">${SI[i.sev]}</text></g>`}).join('')}<text x="12" y="505" font-size="11" fill="var(--mut)">Schematic · DEMO data</text></svg></div>
+<div class="card"><h2>Legend</h2>${SEV.map((s,k)=>sevB(k)).join('')}<br>${Object.keys(RS).map(k=>b('━ '+k,RS[k])).join('')}<p class="mut">Dashed lines = not fully open. Never treat an unverified route as safe.</p><h2>Details</h2>${pick?(pick.cat?irow(pick)+`<p class="mut">Ref ${esc(pick.ref)} · approx. ${pick.lat}, ${pick.lon}</p><button class="s" onclick="flag('${pick.id}')">Report as misinformation</button> (${pick.fl||0} flags)`:`<b>${esc(pick.name)}</b><div>${b(pick.status,RS[pick.status])} ${esc(pick.dist)}</div><div class="mut">Updated ${fmt(pick.upd)} · Source: ${esc(pick.src)} · Not verified</div>`):'<p class="mut">Select a marker or road. '+I.length+' incidents shown.</p>'}</div></div>`};
+const pk=id=>{sel=id;go()},flag=id=>{const i=S.inc.find(x=>x.id===id);i.fl=(i.fl||0)+1;aud('Misinformation flag on '+i.ref);save();go()};
+V.report=()=>{const tz=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+return `<h1>Report an incident</h1><div class="warn">For life-threatening emergencies contact official emergency services first. Reports here are <b>Unverified</b> until reviewed.</div><form class="card" onsubmit="sub(event)" novalidate id="rf"><div id="err" role="alert"></div>
+<label>Category *</label><select name="cat">${opts(CAT)}</select><label>Description * (min. 20 characters)</label><textarea name="desc" maxlength="600"></textarea>
+<div class="fb"><div><label>District *</label><select name="dist">${opts(DS)}</select></div><div><label>Locality *</label><input name="loc" maxlength="80"></div><div><label>Severity *</label><select name="sev">${SEV.map((s,i)=>`<option value="${i}">${s}</option>`).join('')}</select></div></div>
+<div class="fb"><div><label>Latitude (optional)</label><input name="lat" inputmode="decimal"></div><div><label>Longitude (optional)</label><input name="lon" inputmode="decimal"></div><div><label>Date and time *</label><input type="datetime-local" name="t" value="${tz}"></div></div>
+<label>Contact (optional)</label><input name="ct" maxlength="60" placeholder="Phone or email, only if you want follow-up"><label style="display:flex;gap:8px;align-items:flex-start;margin-top:12px"><input type="checkbox" name="cn" style="min-height:0"> I consent to TechTectonics storing this report. Contact details are never shown publicly. *</label><br><button>Submit report</button><p class="mut">Photo upload needs a storage backend and is not included in this preview.</p></form>`};
+function sub(e){e.preventDefault();const f=new FormData(e.target),g=k=>(f.get(k)||'').toString().trim(),er=[],lat=g('lat'),lon=g('lon');
+if(g('desc').length<20)er.push('Description must be at least 20 characters.');if(!g('loc'))er.push('Locality is required.');if(!f.get('cn'))er.push('Please accept the consent notice.');
+if(!g('t')||new Date(g('t'))>new Date(Date.now()+6e4))er.push('Choose a valid date and time that is not in the future.');
+if((lat||lon)&&!(+lat>=27&&+lat<=28.2&&+lon>=87.9&&+lon<=89))er.push('Coordinates must be numbers inside Sikkim (lat 27–28.2, lon 87.9–89).');
+const key=[g('cat'),g('dist'),g('desc')].join('|').toLowerCase(),rec=S.inc.filter(i=>!i.demo&&Date.now()-new Date(i.sub||0)<36e5);
+if(rec.some(i=>i.key===key))er.push('This looks like a duplicate of a report you just sent.');if(rec.length>=5)er.push('Limit reached: 5 reports per hour (demo rate limit).');
+if(er.length){$('#err').innerHTML='<div class="err">'+er.map(x=>'• '+esc(x)).join('<br>')+'</div>';return}
+const ref='TT-'+new Date().toISOString().slice(2,10).replace(/-/g,'')+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+S.inc.push({id:'U'+Date.now(),ref,cat:g('cat'),desc:g('desc'),dist:g('dist'),loc:g('loc'),lat:lat?+lat:27.4,lon:lon?+lon:88.5,approx:!lat,sev:+g('sev'),status:'Submitted',t:new Date(g('t')).toISOString(),sub:new Date().toISOString(),key,ct:g('ct'),fl:0});S.mine.push(ref);save();
+$('#rf').innerHTML=`<div class="ok"><b>Report submitted.</b><br>Reference: <b>${ref}</b><br>Status: Submitted (Unverified). Track it under “My reports”.</div><a href="#/mine"><button type="button">Go to My reports</button></a>`}
+function alRow(a){const c={critical:'#f43f5e',high:'#fb923c',medium:'#facc15',info:'#38bdf8'}[a.level],u=!S.read[a.id];return `<div class="row">${b(a.level.toUpperCase(),c)}${u?b('Unread','#22d3ee'):''}${a.status=='pending'?b('Pending approval','#f59e0b'):''}${!live(a)&&a.status=='published'?b('Expired','#94a3b8'):''}<b>${esc(a.title)}</b><div class="mut">Area: ${esc(a.area)} · Published ${fmt(a.pub)} · Expires ${fmt(a.exp)} · Source: ${esc(a.src)}${a.by?' · Author: '+esc(ROLES[a.by]||a.by):''}</div>${u?`<button class="s" onclick="S.read['${a.id}']=1;save();go()">Mark read</button>`:''}</div>`}
+V.alerts=()=>{const L=S.alerts.filter(a=>(F.d?(a.area===F.d||a.area==='Sikkim-wide'):1)&&(F.w==='hist'?a.status!=='pending'||isA():live(a)));return `<h1>Alerts and notifications</h1><div class="warn">In-app notifications only. No SMS, calls or government notifications are sent. Critical alerts need approval by a second administrator.</div><div class="fb"><select aria-label="District" onchange="F.d=this.value;go()">${opts(DS,F.d,'All districts')}</select><select aria-label="View" onchange="F.w=this.value;go()"><option value="all">Active alerts</option><option value="hist" ${F.w=='hist'?'selected':''}>Alert history</option></select></div><div class="card">${L.map(alRow).join('')||'<p class="mut">No alerts to show.</p>'}</div>`};
+V.roads=()=>`<h1>Road status</h1><div class="warn">Demo data only. Source and verification status are shown for every record. <b>No route should be assumed safe</b> unless an official source says so.</div><div class="fb"><input placeholder="Search roads" aria-label="Search roads" value="${esc(F.q)}" oninput="F.q=this.value;rl()"><select aria-label="District" onchange="F.d=this.value;rl()">${opts(DS,F.d,'All districts')}</select><select aria-label="Status" onchange="F.st=this.value;rl()">${opts(Object.keys(RS),F.st,'All statuses')}</select></div><div class="card" id="rl"></div>`;
+function rl(){const q=F.q.toLowerCase(),L=S.roads.filter(r=>(!F.d||r.dist===F.d)&&(!F.st||r.status===F.st)&&r.name.toLowerCase().includes(q));$('#rl').innerHTML=L.map(r=>`<div class="row"><b>${esc(r.name)}</b> ${b(r.status,RS[r.status])}${b('Not verified','#f59e0b')}${Date.now()-new Date(r.upd)>36e5*48?b('May be outdated','#94a3b8'):''}<div class="mut">${esc(r.dist)} · Updated ${fmt(r.upd)} · Source: ${esc(r.src)}</div>${isA()?`<select aria-label="New status" id="rs${r.id}">${opts(Object.keys(RS),r.status)}</select> <button onclick="setRoad('${r.id}')">Update</button>`:''}</div>`).join('')||'<p class="mut">No roads match.</p>'}
+function setRoad(id){const r=S.roads.find(x=>x.id===id);r.status=$('#rs'+id).value;r.upd=new Date().toISOString();r.src='Administrator update (demo)';aud('Road '+r.name+' → '+r.status);save();rl()}
+V.services=()=>`<h1>Emergency services directory</h1><div class="warn">Numbers marked <b>Cited</b> come from public reports (SSDMA via ANI, 6 Sep 2026, and public directories). Numbers can change, so confirm with official sources. Other entries are <b>placeholders</b>; no numbers are invented.</div><div class="fb"><input placeholder="Search services" aria-label="Search" value="${esc(F.q)}" oninput="F.q=this.value;sl()"><select aria-label="District" onchange="F.d=this.value;sl()">${opts(DS,F.d,'All districts')}</select></div><div class="card" id="sl"></div>`;
+function sl(){const q=F.q.toLowerCase();$('#sl').innerHTML=S.svc.filter(s=>(!F.d||(s.area===F.d||s.area==='Sikkim-wide'))&&(s.name+s.type).toLowerCase().includes(q)).map(s=>`<div class="row"><b>${esc(s.name)}</b> ${s.ver?b((s.src.startsWith('Admin')?'Admin-entered ':'Cited ')+s.ver,'#22c55e'):b('Placeholder','#f59e0b')}<div class="mut">${esc(s.type)} · Area: ${esc(s.area)} · Phone: ${s.phone?`<a style="color:var(--ac)" href="tel:${esc(s.phone)}">${esc(s.phone)}</a>`:'[to be added by admin]'} · Source: ${esc(s.src)}</div></div>`).join('')||'<p class="mut">No services match.</p>'}
+V.mine=()=>{const L=S.inc.filter(i=>S.mine.includes(i.ref));return `<h1>My reports</h1><div class="fb"><input id="lk" placeholder="Enter reference e.g. TT-…" aria-label="Reference"><button onclick="look()">Look up</button></div><div id="lr"></div><div class="card">${L.map(i=>irow(i)+`<p class="mut">Ref <b>${esc(i.ref)}</b></p>${i.status==='Submitted'||i.status==='Under Review'?`<button class="d" onclick="wd('${i.id}')">Withdraw report</button>`:''}`).join('')||'<p class="mut">No reports saved on this device yet.</p>'}</div>`};
+function look(){const i=S.inc.find(x=>x.ref===$('#lk').value.trim().toUpperCase());$('#lr').innerHTML=i?`<div class="ok"><b>${esc(i.ref)}</b> · ${esc(i.cat)} · Status: ${esc(i.status)} · ${vOK(i)?'Verified':'Unverified'}</div>`:'<div class="err">No report found with that reference on this device.</div>'}
+function wd(id){if(!confirm('Withdraw this report? This cannot be undone.'))return;const i=S.inc.find(x=>x.id===id);i.status='Withdrawn';i.ct='';aud('Report withdrawn '+i.ref);save();go()}
+V.admin=()=>{if(!isA()&&R()!=='responder')return `<h1>Admin dashboard</h1><div class="err">Restricted. Use “Demo sign-in” (top right) to switch to Responder or Administrator. <br><span class="mut">In this preview roles are simulated in the browser. In production, permissions are enforced on the server with Supabase row-level security.</span></div>`;
+const Q=S.inc.filter(i=>R()==='responder'?['Assigned','In Progress'].includes(i.status):i.status!=='Withdrawn');
+let h=`<h1>${isA()?'Admin':'Responder'} dashboard</h1><div class="warn">Signed in as <b>${ROLES[R()]}</b> (simulated). Client-side roles are for demonstration only.</div><div class="card"><h2>Incident queue (${Q.length})</h2>`+Q.map(i=>`<div class="row">${irow(i).replace('class="row"','')}<select aria-label="Status" id="is${i.id}">${opts(R()==='responder'?['In Progress','Resolved']:ST,i.status)}</select> <button onclick="setInc('${i.id}')">Set status</button></div>`).join('')+'</div>';
+if(isA())h+=`<br><div class="grid g2"><div class="card"><h2>Create alert</h2><label>Title</label><input id="at" style="width:100%"><label>Level</label><select id="al"><option value="info">Informational</option><option value="medium">Medium</option><option value="high">High</option><option value="critical">Critical (needs 2nd approver)</option></select><label>Area</label><select id="aa">${opts(['Sikkim-wide',...DS])}</select><label>Valid for (hours)</label><input id="ah" type="number" value="12" min="1" max="168"><br><br><button onclick="mkAlert()">Create</button><div id="ae"></div></div>
+<div class="card"><h2>Manage alerts</h2>${S.alerts.map(a=>`<div class="row"><b>${esc(a.title)}</b> ${b(a.status,'#38bdf8')}${a.status==='pending'&&a.by!==R()?`<button onclick="apv('${a.id}')">Approve</button>`:''}${a.status==='pending'&&a.by===R()?'<span class="mut">Needs a different administrator to approve.</span>':''}${live(a)?`<button class="s" onclick="exp('${a.id}')">Expire</button>`:''}</div>`).join('')}</div>
+<div class="card"><h2>Add verified contact</h2><label>Name</label><input id="cn" style="width:100%"><label>Type</label><select id="ct">${opts(['Police','Hospital / ambulance','Fire and rescue','Disaster management','Local administration'])}</select><label>District</label><select id="cd">${opts(DS)}</select><label>Phone (verified only)</label><input id="cp"><br><br><button onclick="addC()">Save contact</button><div id="ce"></div></div>
+<div class="card"><h2>Tools</h2><button class="s" onclick="csv()">Export incidents (CSV)</button> <button class="d" onclick="rst()">Reset demo data</button><textarea id="cv" readonly style="display:none;margin-top:8px"></textarea><p class="mut">Users and role management require the real authentication backend (see limitations).</p></div></div>`;
+return h+`<br><div class="card"><h2>Audit history</h2>${S.audit.map(a=>`<div class="row mut">${fmt(a.t)} · ${esc(a.r)} · ${esc(a.a)}</div>`).join('')||'<p class="mut">No changes yet.</p>'}</div>`};
+function setInc(id){const i=S.inc.find(x=>x.id===id),n=$('#is'+id).value;if(n==='Rejected'&&!confirm('Reject this report?'))return;aud(i.ref+': '+i.status+' → '+n);i.status=n;if(n==='Rejected')i.ct='';save();go()}
+function mkAlert(){const t=$('#at').value.trim(),h=+$('#ah').value;if(t.length<5||!(h>=1&&h<=168)){$('#ae').innerHTML='<div class="err">Enter a title (5+ characters) and 1–168 hours.</div>';return}const c=$('#al').value==='critical';S.alerts.unshift({id:'A'+Date.now(),title:t,level:$('#al').value,area:$('#aa').value,pub:new Date().toISOString(),exp:new Date(Date.now()+h*36e5).toISOString(),src:'Admin (demo)',status:c?'pending':'published',by:R()});aud('Alert created: '+t+(c?' (pending approval)':''));save();go()}
+function apv(id){const a=S.alerts.find(x=>x.id===id);a.status='published';a.pub=new Date().toISOString();aud('Alert approved: '+a.title);save();go()}
+function exp(id){const a=S.alerts.find(x=>x.id===id);if(!confirm('Expire this alert now?'))return;a.exp=new Date().toISOString();aud('Alert expired: '+a.title);save();go()}
+function addC(){const n=$('#cn').value.trim(),p=$('#cp').value.trim();if(n.length<3||!/^[+\d][\d\s-]{4,}$/.test(p)){$('#ce').innerHTML='<div class="err">Enter a name and a valid phone number.</div>';return}S.svc.unshift({id:'S'+Date.now(),name:n,type:$('#ct').value,area:$('#cd').value,phone:p,addr:'',src:'Admin-entered (verify independently)',ver:new Date().toLocaleDateString('en-IN')});aud('Contact added: '+n);save();$('#ce').innerHTML='<div class="ok">Saved to the directory.</div>'}
+function csv(){const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"',t=$('#cv');t.style.display='block';t.value=['ref,category,district,severity,status,time'].concat(S.inc.map(i=>[i.ref,i.cat,i.dist,SEV[i.sev],i.status,i.t].map(q).join(','))).join('\n');t.select();aud('CSV export')}
+function rst(){if(!confirm('Reset ALL data to the demo seed? Saved reports will be deleted.'))return;const r=S.role;S=seed();S.role=r;save();go()}
+V.about=()=>`<h1>About TechTectonics</h1><div class="card"><p>TechTectonics — Sikkim DisasterConnect is a community-information prototype for landslides, flash floods, road blockages and earthquakes in Sikkim, built for a MyBharat social-impact initiative.</p><h2>What works now in this preview</h2><p class="mut">Dashboard with filters, schematic map, historical reported events (30-event dataset with filters, district summary, chart and details), incident reporting with validation, duplicate and rate checks, report tracking and withdrawal, road status with admin updates, alerts with two-person approval and expiry, service directory with admin-added contacts, audit log, CSV export. Data is saved in this browser (localStorage).</p><h2>Demo data</h2><p class="mut">All incidents, roads, alerts and directory entries are fictional or placeholders.</p><h2>Needs real configuration</h2><p class="mut">Supabase (PostgreSQL, Auth, Storage, row-level security) for shared data and real server-side roles · Leaflet + OpenStreetMap tiles · photo uploads · SMS/push channels · official road, weather and IMD/NDMA/SDMA data sources · verified emergency numbers · multilingual content · offline sync. Not included here and not claimed.</p></div>`;
+V.privacy=()=>`<h1>Privacy policy and terms</h1><div class="card"><p class="mut">Reports contain only what you enter. Contact details are optional, stored in your browser in this preview, and never shown publicly. Withdrawing a report clears its contact details. A production deployment needs a retention policy, legal review and a data-deletion process (aligned with India’s DPDP Act, 2023). The Map, Weather and Hospitals pages contact third-party services (OpenStreetMap and OpenTopoMap/Esri map tiles, the Overpass API, and Open-Meteo), which receive your IP address and the area you are viewing. If you tap “Use my location”, your coordinates are used only in your browser and sent to those services to fetch the forecast or nearby hospitals; they are not stored by TechTectonics. TechTectonics is a community-information platform, not an emergency service, and gives no guarantee about route safety or incident accuracy.</p></div>`;
+/* ---- Sikkim Disaster History (data lives in <script id="disasters-data">, not in this code) ---- */
+let DIS=(()=>{try{const a=JSON.parse($('#disasters-data').textContent);return Array.isArray(a)?a:null}catch(e){return null}})();
+/* When served by backend/app.py, load events from the database API; otherwise keep the embedded copy. */
+try{if(/^https?:/.test(location.protocol))fetch('/api/events').then(r=>r.ok?r.json():Promise.reject()).then(a=>{if(Array.isArray(a)&&a.length){DIS=a;go()}}).catch(()=>{})}catch(e){}
+const H={y1:'',y2:'',hz:'',d:'',k:'year',dir:-1,open:null,g:'year'};
+const DCOLS=[['year','Year'],['event','Event'],['hazard_type','Hazard'],['district_primary','District'],['deaths','Deaths'],['missing','Missing'],['people_affected','People affected']];
+const ns=v=>v==null?'<span class="mut">Not stated</span>':Number(v).toLocaleString('en-IN');
+const dTag=e=>e.district_basis!=='location in source'?b('district inferred','#f59e0b'):'';
+const dList=()=>{const x=[...DS,'Statewide','Multiple','Unknown'];DIS.forEach(e=>{if(e.district_primary&&!x.includes(e.district_primary))x.push(e.district_primary)});return x};
+V.history=()=>{if(!DIS)return `<h1>Historical reported events</h1><div class="err">The disaster dataset could not be loaded. Check the JSON block with id “disasters-data”.</div>`;
+const ys=DIS.map(e=>e.year),hz=[...new Set(DIS.map(e=>e.hazard_type))].sort();
+return `<h1>Historical reported events</h1><div class="warn">This dataset has ${DIS.length} events compiled from news and government sources. Counts reflect reporting as well as hazard, and some district labels are inferred. It is not an official statistic and cannot be used to predict risk or compare safety between areas.</div>
+<div class="fb"><label class="i">From <input type="number" aria-label="From year" min="${Math.min(...ys)}" max="${Math.max(...ys)}" placeholder="${Math.min(...ys)}" value="${esc(H.y1)}" onchange="H.y1=this.value;hr()"></label><label class="i">To <input type="number" aria-label="To year" min="${Math.min(...ys)}" max="${Math.max(...ys)}" placeholder="${Math.max(...ys)}" value="${esc(H.y2)}" onchange="H.y2=this.value;hr()"></label>
+<select aria-label="Hazard type" onchange="H.hz=this.value;hr()">${opts(hz,H.hz,'All hazard types')}</select><select aria-label="District" onchange="H.d=this.value;hr()">${opts(dList(),H.d,'All districts')}</select><button class="s" onclick="H.y1=H.y2=H.hz=H.d='';H.open=null;go()">Reset</button></div><div id="hres"></div>`};
+const hf=()=>{const a=H.y1===''?-1e9:+H.y1,z=H.y2===''?1e9:+H.y2;return DIS.filter(e=>e.year>=a&&e.year<=z&&(!H.hz||e.hazard_type===H.hz)&&(!H.d||e.district_primary===H.d))};
+const hs=L=>[...L].sort((x,y)=>{const a=x[H.k],c=y[H.k];if(a==null&&c==null)return 0;if(a==null)return 1;if(c==null)return -1;return(typeof a==='string'?a.localeCompare(c):a-c)*H.dir});
+const hsort=k=>{if(H.k===k)H.dir=-H.dir;else{H.k=k;H.dir=k==='year'?-1:1}hr()};
+const hopen=id=>{H.open=id;hr();const el=$('#hd');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'})};
+function hdet(){const e=DIS.find(x=>x.event_id===H.open);if(!e)return '';
+return `<div class="card" id="hd" style="margin-bottom:12px"><h2>${esc(e.event)}</h2>${dTag(e)}<dl class="dd"><dt>Date (as in source)</dt><dd>${esc(e.date_text)}</dd><dt>Hazard</dt><dd>${esc(e.hazard_type)}</dd><dt>Location</dt><dd>${esc(e.location_text)}</dd><dt>District</dt><dd>${esc(e.district_primary)}${e.districts_other?' (also: '+esc(e.districts_other)+')':''} <span class="mut">· basis: ${esc(e.district_basis)}</span></dd><dt>Deaths</dt><dd>${ns(e.deaths)}</dd><dt>Missing</dt><dd>${ns(e.missing)}</dd><dt>People affected</dt><dd>${ns(e.people_affected)}</dd><dt>Notes</dt><dd>${esc(e.notes)||'<span class="mut">None</span>'}</dd><dt>Source</dt><dd>${esc(e.source)||'<span class="mut">Not stated</span>'}</dd></dl><button class="s" onclick="H.open=null;hr()">Close details</button></div>`}
+function hch(L){const dec=H.g==='decade',m=new Map();L.forEach(e=>{const k=dec?Math.floor(e.year/10)*10:e.year;m.set(k,(m.get(k)||0)+1)});if(!L.length)return '<p class="mut">No events to chart.</p>';
+const yy=L.map(e=>e.year),lo=dec?Math.floor(Math.min(...yy)/10)*10:Math.min(...yy),hi=Math.max(...yy),st=dec?10:1,ks=[];for(let k=lo;k<=hi;k+=st)ks.push(k);
+const mx=Math.max(...m.values()),W=600,Ht=210,pl=26,bw=(W-pl-8)/ks.length;
+return `<svg viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Bar chart of reported events per ${dec?'decade':'year'}">`+[0,Math.ceil(mx/2),mx].filter((v,i,a)=>a.indexOf(v)===i).map(v=>{const y=Ht-30-v/mx*(Ht-60);return `<line x1="${pl}" x2="${W-4}" y1="${y}" y2="${y}" stroke="var(--bd)"/><text x="${pl-4}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--mut)">${v}</text>`}).join('')+ks.map((k,i)=>{const n=m.get(k)||0,h=n/mx*(Ht-60),x=pl+i*bw+bw*.15,lab=dec?k+'s':(ks.length>14?(k%5===0?k:''):k);return `<g><title>${dec?k+'s':k}: ${n} event${n===1?'':'s'}</title>${n?`<rect x="${x}" y="${Ht-30-h}" width="${bw*.7}" height="${h}" rx="2" fill="var(--ac2)"/><text x="${x+bw*.35}" y="${Ht-33-h}" text-anchor="middle" font-size="10" fill="var(--tx)">${n}</text>`:''}<text x="${x+bw*.35}" y="${Ht-14}" text-anchor="middle" font-size="10" fill="var(--mut)">${lab}</text></g>`}).join('')+'</svg>'}
+function hr(){const f=hf(),L=hs(f),el=$('#hres');if(!el)return;
+const st=(S2,k)=>{const s=S2.filter(e=>e[k]!=null);return{sum:s.reduce((a,e)=>a+e[k],0),n:s.length}},cell=(x,n)=>n===0?'—':x.n===0?'<span class="mut">Not stated</span>':x.sum.toLocaleString('en-IN')+(x.n<n?` <span class="mut">(${x.n} of ${n} events state a figure)</span>`:'');
+const rows=dList().map(d=>{const S2=f.filter(e=>e.district_primary===d),n=S2.length;return `<tr><td>${esc(d)}</td><td>${n}</td><td>${cell(st(S2,'deaths'),n)}</td><td>${cell(st(S2,'missing'),n)}</td></tr>`}).join('');
+const arrow=k=>H.k===k?(H.dir>0?' ▲':' ▼'):'';
+el.innerHTML=hdet()+`<div class="card" style="margin-bottom:12px"><div class="mut" role="status">Showing ${L.length} of ${DIS.length} events${(H.y1!==''&&H.y2!==''&&+H.y1>+H.y2)?' — the start year is after the end year.':'.'}</div><div class="tw"><table><thead><tr>${DCOLS.map(([k,t])=>`<th scope="col" aria-sort="${H.k===k?(H.dir>0?'ascending':'descending'):'none'}"><button class="th" onclick="hsort('${k}')">${t}${arrow(k)}</button></th>`).join('')}</tr></thead><tbody>${L.map(e=>`<tr><td>${e.year}</td><td><button class="th" style="text-align:left;color:var(--ac)" onclick="hopen(${+e.event_id})" aria-label="View details: ${esc(e.event)}">${esc(e.event)}</button><div class="mut">${esc(e.date_text)}</div></td><td>${esc(e.hazard_type)}</td><td>${esc(e.district_primary)} ${dTag(e)}</td><td>${ns(e.deaths)}</td><td>${ns(e.missing)}</td><td>${ns(e.people_affected)}</td></tr>`).join('')||'<tr><td colspan="7" class="mut">No events match these filters.</td></tr>'}</tbody></table></div></div>
+<div class="grid g2"><div class="card"><h2>Summary by district (events shown above)</h2><div class="tw"><table style="min-width:420px"><thead><tr><th scope="col">District</th><th scope="col">Events</th><th scope="col">Reported deaths</th><th scope="col">Reported missing</th></tr></thead><tbody>${rows}</tbody></table></div><p class="mut">Totals add only the figures that sources state. “Not stated” does not mean zero.</p></div>
+<div class="card"><h2>Events over time</h2><div class="fb"><select aria-label="Group by" onchange="H.g=this.value;hr()"><option value="year">By year</option><option value="decade" ${H.g==='decade'?'selected':''}>By decade</option></select></div>${hch(f)}</div></div>`}
+
+/* ---- Real map, weather forecast and nearby hospitals ---- */
+const HQ={Gangtok:[27.3314,88.6138],Pakyong:[27.2333,88.5833],Mangan:[27.5167,88.5333],Gyalshing:[27.2833,88.2667],Soreng:[27.1667,88.2167],Namchi:[27.1667,88.35]};
+let LM=null,MV=null,MBASE='Terrain',HL=null,HM={};
+const hasLL=i=>i.lat!==''&&i.lat!=null&&i.lon!==''&&i.lon!=null&&Number.isFinite(+i.lat)&&Number.isFinite(+i.lon);
+const kmd=(a,b,c,d)=>{const r=x=>x*Math.PI/180,h=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(h))};
+async function jf(url,opt){const ac=new AbortController(),t=setTimeout(()=>ac.abort(),20000);try{const r=await fetch(url,Object.assign({signal:ac.signal},opt||{}));if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}}
+function getPos(ok,msg){if(!navigator.geolocation){msg('Location is not available on this device.');return}navigator.geolocation.getCurrentPosition(p=>ok(p.coords.latitude,p.coords.longitude),e=>msg(e.code===1?'Location permission was denied. Pick a district instead.':'Could not get your location. Location needs the secure https link of the site; pick a district instead.'),{timeout:12000,maximumAge:60000})}
+function mkMap(el){
+ const terr=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{maxZoom:17,attribution:'Map data © OpenStreetMap contributors, SRTM · Style © OpenTopoMap (CC-BY-SA)'}),
+ osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}),
+ sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Imagery © Esri, Maxar, Earthstar Geographics'}),
+ bases={'Terrain':terr,'Street':osm,'Satellite':sat};
+ const m=L.map(el,{layers:[bases[MBASE]||terr],worldCopyJump:false});
+ m.on('baselayerchange',e=>{MBASE=e.name});
+ return {m,bases};
+}
+function hIcon(){return L.divIcon({html:'<div class="hmk">🏥</div>',className:'',iconSize:[30,30],iconAnchor:[15,15],popupAnchor:[0,-14]})}
+function hPopup(h){const ph=h.phone?`<br>Phone: <a href="tel:${esc(h.phone.replace(/[^\d+]/g,''))}">${esc(h.phone)}</a>`:'';return `<b>${esc(h.name)}</b><br>${h.type} · ${h.km.toFixed(1)} km straight-line${ph}<br><a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}" target="_blank" rel="noopener">Directions</a>`}
+function addHosp(list){if(!LM||!HL)return;list.forEach(h=>{const mk=L.marker([h.lat,h.lon],{icon:hIcon(),title:h.name}).bindPopup(hPopup(h));mk.addTo(HL);HM[h.id]=mk})}
+const HC={};
+async function getHosp(lat,lon,rad){
+ const key=lat.toFixed(2)+','+lon.toFixed(2)+','+rad;
+ if(HC[key]&&Date.now()-HC[key].t<6e5)return HC[key].d;
+ const r=rad*1000,q=`[out:json][timeout:25];(nwr["amenity"="hospital"](around:${r},${lat},${lon});nwr["healthcare"="hospital"](around:${r},${lat},${lon});nwr["amenity"="clinic"](around:${r},${lat},${lon}););out center tags 120;`;
+ let err;
+ for(const u of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']){
+  try{
+   const j=await jf(u,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(q)}),seen=new Set();
+   const d=(j.elements||[]).map(e=>{const t=e.tags||{},la=e.lat!=null?e.lat:(e.center&&e.center.lat),lo=e.lon!=null?e.lon:(e.center&&e.center.lon),cl=t.amenity==='clinic';
+    return{id:e.type+e.id,name:t.name||t['name:en']||(cl?'Clinic (name not listed)':'Hospital (name not listed)'),type:cl?'Clinic':'Hospital',lat:la,lon:lo,phone:t.phone||t['contact:phone']||'',addr:[t['addr:street'],t['addr:suburb']||t['addr:city']].filter(Boolean).join(', '),er:t.emergency==='yes',km:kmd(lat,lon,la,lo)}})
+    .filter(x=>x.lat!=null&&x.lon!=null&&!seen.has(x.id)&&seen.add(x.id)).sort((a,b)=>a.km-b.km);
+   HC[key]={t:Date.now(),d};return d;
+  }catch(e){err=e}
+ }
+ throw err;
+}
+const mdet=()=>{const I=vis(),pick=sel&&(S.inc.find(i=>i.id===sel)||S.roads.find(r=>r.id===sel)),un=I.filter(i=>!hasLL(i)).length;
+ return `<h2>Legend</h2>${SEV.map((s,k)=>sevB(k)).join('')}<br>${Object.keys(RS).map(k=>b('━ '+k,RS[k])).join('')}<div>${b('🏥 Hospital / clinic','#be123c')}</div><p class="mut">Dashed lines = not fully open. Never treat an unverified route as safe. Switch Terrain, Street or Satellite with the layer button on the map.</p><h2>Details</h2>${pick?(pick.cat?irow(pick)+`<p class="mut">Ref ${esc(pick.ref)} · approx. ${pick.lat}, ${pick.lon}</p><button class="s" onclick="flag('${pick.id}')">Report as misinformation</button> (${pick.fl||0} flags)`:`<b>${esc(pick.name)}</b><div>${b(pick.status,RS[pick.status])} ${esc(pick.dist)}</div><div class="mut">Updated ${fmt(pick.upd)} · Source: ${esc(pick.src)} · Not verified</div>`):'<p class="mut">Tap a marker or road. '+I.length+' incidents match the filters'+(un?' ('+un+' without coordinates are not on the map)':'')+'.</p>'}`};
+const mpk=id=>{sel=id;const d=$('#mdet');if(d)d.innerHTML=mdet()};
+V.map=()=>{if(typeof L==='undefined')return V.mapSvg();
+ return `<h1>Disaster map</h1><div class="warn">Live map from OpenStreetMap with terrain and satellite views. Incident and road positions are approximate DEMO data.</div>${filt(1)}<div class="gm"><div class="card"><div id="lm" role="region" aria-label="Interactive map of Sikkim"></div><div class="fb" style="margin:8px 0 0"><button type="button" onclick="mapHosp()">🏥 Hospitals near map centre</button><button type="button" class="s" onclick="mapLoc()">📍 My location</button></div><div id="lmsg" class="mut" role="status"></div></div><div class="card" id="mdet">${mdet()}</div></div>`};
+function initMap(){
+ const el=$('#lm');if(!el||typeof L==='undefined')return;
+ const {m,bases}=mkMap(el);LM=m;HM={};
+ const I=vis().filter(hasLL),ig=L.layerGroup(),rg=L.layerGroup();HL=L.layerGroup();
+ S.roads.filter(r=>(!F.d||r.dist===F.d)&&(!F.st||r.status===F.st)).forEach(r=>L.polyline(r.pts,{color:RS[r.status],weight:sel===r.id?8:5,dashArray:r.status==='Open'?null:'8 6',opacity:.9}).on('click',()=>mpk(r.id)).bindTooltip(r.name).addTo(rg));
+ I.forEach(i=>L.circleMarker([+i.lat,+i.lon],{radius:sel===i.id?13:10,color:'#0a1428',weight:2,fillColor:SC[i.sev],fillOpacity:.95}).on('click',()=>mpk(i.id)).bindTooltip(i.cat+' · '+SEV[i.sev]).addTo(ig));
+ rg.addTo(m);ig.addTo(m);HL.addTo(m);
+ L.control.layers(bases,{'Incidents':ig,'Roads':rg,'Hospitals':HL},{collapsed:true}).addTo(m);
+ L.control.scale({imperial:false}).addTo(m);
+ if(MV)m.setView(MV.c,MV.z);else m.fitBounds([[27.05,88.0],[28.15,88.95]]);
+ m.on('moveend',()=>{const c=m.getCenter();MV={c:[c.lat,c.lng],z:m.getZoom()}});
+ setTimeout(()=>m.invalidateSize(),150);
+}
+async function mapHosp(){const msg=$('#lmsg');if(!LM)return;const c=LM.getCenter();msg.textContent='Searching for hospitals within 25 km of the map centre…';
+ try{const d=await getHosp(c.lat,c.lng,25);if(!LM)return;addHosp(d);msg.textContent=d.length?d.length+' hospitals and clinics found. Straight-line distances only; by road it can take much longer. Data: OpenStreetMap volunteers, may be incomplete.':'No hospitals are listed in OpenStreetMap within 25 km of the map centre. Zoom to another area and try again.'}catch(e){msg.textContent='Could not load hospitals (no internet or the service is busy). Try again shortly.'}}
+function mapLoc(){const msg=$('#lmsg');getPos((la,lo)=>{if(!LM)return;LM.setView([la,lo],12);L.circleMarker([la,lo],{radius:8,color:'#fff',weight:3,fillColor:'#2563eb',fillOpacity:1}).bindTooltip('You are here').addTo(LM);msg.textContent='Showing your location. Use "Hospitals near map centre" to find the nearest ones.'},t=>{msg.textContent=t})}
+
+/* Weather (Open-Meteo, no key needed) */
+const WC={0:['☀️','Clear'],1:['🌤️','Mostly clear'],2:['⛅','Partly cloudy'],3:['☁️','Overcast'],45:['🌫️','Fog'],48:['🌫️','Freezing fog'],51:['🌦️','Light drizzle'],53:['🌦️','Drizzle'],55:['🌧️','Heavy drizzle'],56:['🌧️','Freezing drizzle'],57:['🌧️','Freezing drizzle'],61:['🌧️','Light rain'],63:['🌧️','Rain'],65:['🌧️','Heavy rain'],66:['🌧️','Freezing rain'],67:['🌧️','Freezing rain'],71:['🌨️','Light snow'],73:['🌨️','Snow'],75:['❄️','Heavy snow'],77:['🌨️','Snow grains'],80:['🌦️','Showers'],81:['🌧️','Heavy showers'],82:['⛈️','Violent showers'],85:['🌨️','Snow showers'],86:['🌨️','Heavy snow showers'],95:['⛈️','Thunderstorm'],96:['⛈️','Thunderstorm, hail'],99:['⛈️','Severe thunderstorm, hail']};
+const wc=c=>WC[c]||['🌡️','Unknown'];
+let WP={n:'Gangtok',lat:HQ.Gangtok[0],lon:HQ.Gangtok[1]};
+async function wxFetch(lat,lon){
+ const key='ttwx:'+lat.toFixed(2)+','+lon.toFixed(2);
+ try{const j=await jf('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=Asia%2FKolkata&forecast_days=7');
+  try{localStorage.setItem(key,JSON.stringify({t:Date.now(),j}))}catch(e){}return{j,stale:0}}
+ catch(e){try{const c=JSON.parse(localStorage.getItem(key));if(c&&c.j)return{j:c.j,stale:c.t}}catch(x){}throw e}
+}
+const rainB=mm=>mm>=115.6?b('Very heavy rain','#f43f5e'):mm>=64.5?b('Heavy rain','#fb923c'):mm>=15.6?b('Moderate rain','#facc15'):'';
+V.weather=()=>`<h1>Weather forecast</h1><div class="warn">Forecast data from Open-Meteo. Mountain weather changes fast and valley forecasts can miss local downpours. Heavy rain can trigger landslides and flash floods in Sikkim, but this page is <b>not</b> a landslide prediction. Follow official IMD and state alerts.</div><div class="fb"><select id="wsel" aria-label="District" onchange="wxPick(this.value)">${opts(DS,WP.n)}</select><button class="s" type="button" onclick="wxLoc()">📍 Use my location</button></div><div class="card" id="wx" role="status">Loading forecast…</div>`;
+function wxPick(v){WP={n:v,lat:HQ[v][0],lon:HQ[v][1]};wxLoad()}
+function wxLoc(){getPos((la,lo)=>{WP={n:'your location',lat:la,lon:lo};wxLoad()},t=>{const e=$('#wx');if(e)e.innerHTML='<div class="err">'+esc(t)+'</div>'})}
+async function wxLoad(){const el=$('#wx');if(!el)return;el.textContent='Loading forecast…';
+ try{const {j,stale}=await wxFetch(WP.lat,WP.lon),c=j.current,d=j.daily,e=$('#wx');if(!e)return;const [ic,tx]=wc(c.weather_code);
+  e.innerHTML=`<h2>${esc(WP.n)} ${WP.n!=='your location'?'<span class="mut" style="font-weight:400">(district HQ, approx.)</span>':''}</h2>${stale?'<div class="warn">You are offline. Showing the forecast saved '+fmt(stale)+'.</div>':''}<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div class="e" style="font-size:46px">${ic}</div><div><div class="big">${Math.round(c.temperature_2m)}°C</div><div>${tx} · feels like ${Math.round(c.apparent_temperature)}°C</div><div class="mut">Humidity ${c.relative_humidity_2m}% · Wind ${Math.round(c.wind_speed_10m)} km/h · Rain now ${c.precipitation} mm</div></div></div><h2 style="margin-top:14px">7-day forecast</h2><div class="wxd">${d.time.map((t,i)=>{const [e2,t2]=wc(d.weather_code[i]);return `<div><b>${new Date(t+'T00:00').toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</b><div class="e">${e2}</div>${t2}<div><b>${Math.round(d.temperature_2m_max[i])}°</b> / ${Math.round(d.temperature_2m_min[i])}°</div><div class="mut">Rain ${d.precipitation_sum[i]} mm${d.precipitation_probability_max[i]!=null?' · '+d.precipitation_probability_max[i]+'%':''}</div>${rainB(d.precipitation_sum[i])}</div>`}).join('')}</div><p class="mut">Heavy rain here means 64.5 mm or more in 24 hours (India Meteorological Department scale). Updated ${fmt(new Date())}.</p>`
+ }catch(x){const e=$('#wx');if(e)e.innerHTML='<div class="err">Could not load the forecast. Check your internet connection and try again.</div><button type="button" onclick="wxLoad()">Retry</button>'}}
+async function homeWx(){const el=$('#hwx');if(!el)return;
+ try{const {j}=await wxFetch(HQ.Gangtok[0],HQ.Gangtok[1]),e=$('#hwx');if(!e)return;const c=j.current,d=j.daily,[ic,tx]=wc(c.weather_code);
+  e.innerHTML=`<h2>Weather in Gangtok</h2><div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="font-size:34px">${ic}</span><span><b style="font-size:22px">${Math.round(c.temperature_2m)}°C</b> ${tx}<br><span class="mut">Today ${Math.round(d.temperature_2m_max[0])}° / ${Math.round(d.temperature_2m_min[0])}° · rain ${d.precipitation_sum[0]} mm · next 3 days: ${[1,2,3].map(i=>d.precipitation_sum[i]+' mm').join(', ')}</span></span> ${rainB(Math.max(...d.precipitation_sum.slice(0,3)))}</div><a href="#/weather"><button type="button" class="s" style="margin-top:8px">Full forecast for every district</button></a>`
+ }catch(x){const e=$('#hwx');if(e)e.innerHTML='<h2>Weather in Gangtok</h2><span class="mut">Forecast unavailable offline. </span><a href="#/weather" style="color:var(--ac)">Try the weather page</a>'}}
+
+/* Nearby hospitals (OpenStreetMap data via Overpass) */
+let HP={n:'Gangtok',lat:HQ.Gangtok[0],lon:HQ.Gangtok[1],rad:25};
+V.hospitals=()=>`<h1>Nearby hospitals</h1><div class="warn"><b>In an emergency call 112.</b> Distances are straight-line; by road in the hills the trip can be much longer and roads may be blocked, so check the <a href="#/roads" style="color:var(--ac)">Roads</a> page. Hospital data comes from OpenStreetMap volunteers and may be incomplete or out of date. Call ahead to confirm services.</div><div class="fb"><select id="hsel" aria-label="District" onchange="hpPick(this.value)">${opts(DS,HP.n)}</select><select id="hrad" aria-label="Search radius" onchange="HP.rad=+this.value;hpLoad()">${[10,25,50].map(r=>`<option value="${r}" ${HP.rad===r?'selected':''}>Within ${r} km</option>`).join('')}</select><button class="s" type="button" onclick="hpLoc()">📍 Use my location</button></div><div class="${typeof L!=='undefined'?'gm':''}">${typeof L!=='undefined'?'<div class="card"><div id="hm" role="region" aria-label="Map of nearby hospitals"></div></div>':''}<div class="card" id="hl" role="status">Searching…</div></div>`;
+function hpPick(v){HP.n=v;HP.lat=HQ[v][0];HP.lon=HQ[v][1];hpLoad()}
+function hpLoc(){getPos((la,lo)=>{HP.n='your location';HP.lat=la;HP.lon=lo;hpLoad()},t=>{const e=$('#hl');if(e)e.innerHTML='<div class="err">'+esc(t)+'</div>'})}
+function hpFocus(id){const m=HM[id];if(!m||!LM)return;LM.setView(m.getLatLng(),14);m.openPopup();const e=$('#hm');if(e)e.scrollIntoView({block:'center',behavior:'smooth'})}
+async function hpLoad(){const el=$('#hl');if(!el)return;el.textContent='Searching OpenStreetMap for hospitals within '+HP.rad+' km of '+HP.n+'…';
+ if(typeof L!=='undefined'&&$('#hm')){if(LM){LM.remove();LM=null}const {m}=mkMap($('#hm'));LM=m;HM={};HL=L.layerGroup().addTo(m);m.setView([HP.lat,HP.lon],10);L.circleMarker([HP.lat,HP.lon],{radius:8,color:'#fff',weight:3,fillColor:'#2563eb',fillOpacity:1}).bindTooltip(HP.n==='your location'?'You are here':HP.n+' (district HQ)').addTo(m);setTimeout(()=>m.invalidateSize(),150)}
+ try{const d=await getHosp(HP.lat,HP.lon,HP.rad),e=$('#hl');if(!e)return;
+  if(LM){addHosp(d);if(d.length)LM.fitBounds(L.latLngBounds(d.slice(0,15).map(h=>[h.lat,h.lon]).concat([[HP.lat,HP.lon]])),{padding:[30,30],maxZoom:13})}
+  e.innerHTML=`<h2>${d.length} found near ${esc(HP.n)}</h2>`+(d.slice(0,40).map(h=>`<div class="row"><b>${esc(h.name)}</b> ${b(h.type,h.type==='Hospital'?'#be123c':'#0e7490')}${h.er?b('Emergency','#f43f5e'):''}<div class="mut">${h.km.toFixed(1)} km straight-line${h.addr?' · '+esc(h.addr):''}${h.phone?' · <a style="color:var(--ac)" href="tel:'+esc(h.phone.replace(/[^\d+]/g,''))+'">'+esc(h.phone)+'</a>':' · phone not listed'}</div><a style="color:var(--ac)" href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lon}" target="_blank" rel="noopener">Directions</a>${LM?` · <a href="#" style="color:var(--ac)" onclick="hpFocus('${h.id}');return false">Show on map</a>`:''}</div>`).join('')||'<p class="mut">No hospitals or clinics are listed in OpenStreetMap within this radius. Try a larger radius or another district.</p>')+(d.length>40?'<p class="mut">Showing the nearest 40.</p>':'')
+ }catch(x){const e=$('#hl');if(e)e.innerHTML='<div class="err">Could not load hospitals. Check your internet connection and try again.</div><button type="button" onclick="hpLoad()">Retry</button>'}}
+const NAV=[['home','Dashboard'],['map','Map'],['weather','Weather'],['hospitals','Hospitals'],['report','Report'],['roads','Roads'],['alerts','Alerts'],['services','Services'],['history','History'],['mine','My reports'],['admin','Admin'],['about','About']];
+function go(){let r=location.hash.replace('#/','')||'home';if(!V[r])r='home';const u=S.alerts.filter(a=>live(a)&&!S.read[a.id]).length;
+$('#nav').innerHTML=NAV.map(([k,t])=>`<a href="#/${k}" class="${k===r?'on':''}">${t}${k==='alerts'&&u?' ('+u+')':''}</a>`).join('');
+$('#role').innerHTML=Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${k===R()?'selected':''}>${v}</option>`).join('');
+if(LM){LM.remove();LM=null}$('#app').innerHTML=V[r]();if(r==='map')initMap();if(r==='weather')wxLoad();if(r==='hospitals')hpLoad();if(r==='home')homeWx();if(r==='roads')rl();if(r==='services')sl();if(r==='history')hr()}
+const setRole=v=>{S.role=v;save();go()};
+let th='dark';try{th=localStorage.getItem('tnxth')||'dark'}catch(e){}document.documentElement.dataset.theme=th;
+const tog=()=>{th=th==='dark'?'light':'dark';document.documentElement.dataset.theme=th;try{localStorage.setItem('tnxth',th)}catch(e){}};
+addEventListener('hashchange',()=>{F.q='';go();scrollTo(0,0)});go();
+</script></body></html>
